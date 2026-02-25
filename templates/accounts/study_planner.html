@@ -1,0 +1,172 @@
+{% extends "base.html" %}
+{% block content %}
+
+<!-- PAGE TITLE -->
+<div class="card" style="display:flex; align-items:center; justify-content:space-between;">
+
+    <h2 style="font-weight:600; color:#c4b5fd; margin:0;">
+        📅 Study Planner
+    </h2>
+
+    <span style="
+        font-size:14px;
+        color:#94a3b8;
+        letter-spacing:0.5px;
+    ">
+        Design your focus for today,
+        Small steps. Big growth.
+    </span>
+
+</div>
+
+<!-- ADD TASK -->
+<div class="card">
+    <form method="POST" style="display:flex; gap:10px;">
+        {% csrf_token %}
+        <input 
+            type="text" 
+            name="task" 
+            placeholder="Write today's task..."
+            required
+            style="
+                flex:1;
+                padding:12px;
+                border-radius:10px;
+                background:#1e293b;
+                color:white;
+                border:none;
+                outline:none;
+            "
+        >
+        <button type="submit">Add</button>
+    </form>
+</div>
+
+
+<!-- TASK LIST -->
+<div class="card" style="
+    background:#1f2937;
+    padding:25px;
+    border-radius:16px;
+    box-shadow:0 10px 30px rgba(0,0,0,0.35);
+">
+
+    <h4 style="
+        margin-bottom:20px;
+        font-size:18px;
+        font-weight:600;
+        color:#a78bfa;
+    ">
+        📒 Today's Focus
+    </h4>
+
+    {% for task in tasks %}
+    <div style="
+        display:flex;
+        justify-content:space-between;
+        align-items:center;
+        padding:14px 0;
+        border-bottom:1px solid rgba(255,255,255,0.06);
+    ">
+
+        <span style="
+            font-size:16px;
+            color:{% if task.is_completed %}#22c55e{% else %}#e2e8f0{% endif %};
+            text-decoration:{% if task.is_completed %}line-through{% else %}none{% endif %};
+        ">
+            {{ task.title }}
+        </span>
+
+        <div style="display:flex; gap:16px;">
+
+            <a href="{% url 'toggle_task' task.id %}"
+               style="color:#a78bfa; text-decoration:none; font-weight:500;">
+                {% if task.is_completed %}Undo{% else %}Done{% endif %}
+            </a>
+
+            <a href="{% url 'delete_task' task.id %}"
+               style="color:#f87171; text-decoration:none; font-weight:500;">
+                Delete
+            </a>
+
+        </div>
+
+    </div>
+    {% empty %}
+        <p style="color:#64748b;">No tasks added yet.</p>
+    {% endfor %}
+
+</div>
+
+
+<!-- DAILY PROGRESS -->
+<div class="card" style="
+    margin-top:20px;
+    padding:20px;
+    background:#1e293b;
+">
+
+    <h4 style="color:#a78bfa; margin-bottom:15px;">
+        📊 Daily Progress
+    </h4>
+
+    <p style="color:#94a3b8; margin-bottom:5px;">
+        Total Tasks: <strong>{{ total_tasks }}</strong>
+    </p>
+
+    <p style="color:#22c55e; margin-bottom:15px;">
+        Completed: <strong>{{ completed_tasks }}</strong>
+    </p>
+
+    {% if total_tasks > 0 %}
+        <div style="
+            width:100%;
+            height:10px;
+            background:#334155;
+            border-radius:6px;
+        ">
+            <div style="
+                width:{{ completion_percentage }}%;
+                height:10px;
+                background:linear-gradient(90deg,#a78bfa,#8b5cf6);
+                border-radius:6px;
+                transition:0.4s;
+            ">
+            </div>
+        </div>
+
+        <p style="color:#94a3b8; margin-top:8px;">
+            {{ completion_percentage }}% completed
+        </p>
+
+
+        <div class="card" style="
+    margin-top:20px;
+    padding:25px;
+    background:linear-gradient(135deg,#1e293b,#0f172a);
+    border-left:4px solid #8b5cf6;
+">
+
+    <p style="
+        font-size:16px;
+        color:#e2e8f0;
+        margin:0;
+        font-weight:500;
+    ">
+        ✨ Consistency beats intensity. Show up today.
+    </p>
+
+    <p style="
+        font-size:13px;
+        color:#94a3b8;
+        margin-top:8px;
+    ">
+        Every completed task compounds your growth.
+    </p>
+
+
+    {% endif %}
+
+</div>
+</div>
+{% endblock %}

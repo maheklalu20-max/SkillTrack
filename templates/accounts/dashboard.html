@@ -1,0 +1,237 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- Page Header -->
+<div class="page-header">
+    <h1>Dashboard</h1>
+    <p>Track your skills and monitor your growth</p>
+</div>
+<div class="card">
+    <h2>Welcome {{ user.username }}</h2>
+    <p><strong>Total Hours Invested:</strong> {{ total_hours }} hrs</p>
+</div>
+<!-- ADD SKILL SECTION -->
+<div class="card">
+    <h3 style="margin-bottom: 15px;">➕ Add New Skill</h3>
+
+    <form method="POST" style="display:flex; gap:10px; flex-wrap:wrap;">
+        {% csrf_token %}
+        <input type="text" name="name" placeholder="Skill name" required>
+        <input type="number" name="hours" placeholder="Hours spent" required>
+        <button type="submit">Add Skill</button>
+    <textarea name="note" placeholder="What did you learn today?" rows="3"
+style="padding:10px; border-radius:8px; background:#334155; color:white; border:none;">
+</textarea>
+    </form>
+</div>
+
+    <!-- YOUR SKILLS SECTION -->
+<div class="card">
+    <h3 style="margin-bottom: 20px;">🚀 Your Skills</h3>
+
+    {% if skills %}
+        <div style="display: flex; flex-direction: column; gap: 15px;">
+
+            {% for skill in skills %}
+            <div style="
+                background: #1e293b;
+                padding: 18px;
+                border-radius: 12px;
+                box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+                transition: 0.3s;
+            "
+            onmouseover="this.style.transform='translateY(-3px)'"
+            onmouseout="this.style.transform='translateY(0px)'"
+            >
+
+                <div style="display:flex; justify-content: space-between; align-items:center;">
+                    
+                    <div>
+                        <h4 style="margin:0; color:white;">
+                            {{ skill.name|title }}
+                        </h4>
+                        <p style="margin:5px 0 0 0; color:#94a3b8;">
+                            {{ skill.hours_spent }} hrs invested
+                        </p>
+                        <p style="
+    margin-top:5px;
+    display:inline-block;
+    background:#334155;
+    padding:4px 10px;
+    border-radius:20px;
+    font-size:13px;
+    color:#a78bfa;
+">
+    {{ skill.level }}
+</p>
+
+<div style="margin-top:15px;">
+    <h5 style="color:#a78bfa;">📝 Notes</h5>
+
+    {% for note in skill.notes.all %}
+        <div style="
+            background:#0f172a;
+            padding:10px;
+            border-radius:8px;
+            margin-bottom:6px;
+            font-size:14px;
+            color:#94a3b8;
+        ">
+            {{ note.content }}
+            <div style="font-size:12px; color:#64748b;">
+                {{ note.created_at|date:"M d, Y H:i" }}
+            </div>
+        </div>
+    {% empty %}
+        <p style="color:#64748b;">No notes yet.</p>
+    {% endfor %}
+</div>
+                    </div>
+                
+                    <a href="{% url 'delete_skill' skill.id %}"
+                       style="
+                        text-decoration:none;
+                        background:#ef4444;
+                        color:white;
+                        padding:6px 10px;
+                        border-radius:6px;
+                        font-size:14px;
+                       ">
+                        Delete
+                    </a>
+                </div>
+
+                <!-- Progress Bar Per Skill -->
+                <div style="margin-top:12px; height:8px; background:#334155; border-radius:6px;">
+                    <div style="
+                        width: {{ skill.hours_spent|floatformat:0 }}%;
+                        max-width:100%;
+                        height:8px;
+                        background: linear-gradient(90deg,#a78bfa,#6366f1);
+                        border-radius:6px;">
+                    </div>
+                </div>
+
+            </div>
+            {% endfor %}
+
+        </div>
+    {% else %}
+        <p style="color:#94a3b8;">No skills added yet.</p>
+    {% endif %}
+</div>
+
+<div class="card">
+    <h3>📊 Skill Analytics</h3>
+
+    <div style="display: flex; gap: 40px; flex-wrap: wrap;">
+        <div style="flex: 1; min-width: 300px;">
+            <canvas id="skillsChart"></canvas>
+        </div>
+
+        <div style="flex: 1; min-width: 300px;">
+            <canvas id="skillsPieChart"></canvas>
+        </div>
+    </div>
+</div>
+<div style="
+    margin-top: 40px;
+    padding: 25px;
+    text-align: center;
+    background: linear-gradient(135deg, #1e293b, #0f172a);
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+">
+
+    <h3 style="
+        margin: 0;
+        font-weight: 600;
+        background: linear-gradient(90deg, #a78bfa, #6366f1);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    ">
+        🚀 Keep Building. Keep Growing.
+    </h3>
+
+    <p style="margin-top: 10px; color: #94a3b8;">
+        Every hour you invest today builds the expert you'll become tomorrow.
+    </p>
+
+</div>
+
+<script>
+    const skillNames = JSON.parse('{{ skill_names|escapejs }}');
+    const skillHours = JSON.parse('{{ skill_hours|escapejs }}');
+
+    // =====================
+    // BAR CHART
+    // =====================
+    const ctx = document.getElementById('skillsChart').getContext('2d');
+
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: skillNames,
+            datasets: [{
+                label: 'Hours Invested',
+                data: skillHours,
+                backgroundColor: 'rgba(79, 70, 229, 0.7)',
+                borderRadius: 6
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { display: false }
+            },
+            scales: {
+                y: { beginAtZero: true }
+            }
+        }
+    });
+
+    // =====================
+    // PIE CHART WITH PERCENTAGES
+    // =====================
+    const total = skillHours.reduce((a, b) => a + b, 0);
+    const pieCtx = document.getElementById('skillsPieChart').getContext('2d');
+
+    new Chart(pieCtx, {
+        type: 'pie',
+        data: {
+            labels: skillNames,
+            datasets: [{
+                data: skillHours,
+                backgroundColor: [
+                    '#4f46e5',
+                    '#06b6d4',
+                    '#10b981',
+                    '#f59e0b',
+                    '#ef4444',
+                    '#8b5cf6',
+                    '#14b8a6',
+                    '#f43f5e'
+                ]
+            }]
+        },
+        plugins: [ChartDataLabels],
+        options: {
+            responsive: true,
+            plugins: {
+                datalabels: {
+                    color: '#fff',
+                    font: {
+                        weight: 'bold',
+                        size: 14
+                    },
+                    formatter: (value) => {
+                        const percentage = (value / total * 100).toFixed(1);
+                        return percentage + "%";
+                    }
+                }
+            }
+        }
+    });
+</script>
+
+{% endblock %}

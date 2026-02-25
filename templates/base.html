@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SkillTrack</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+
+   <style>
+    body {
+        margin: 0;
+        font-family: 'Segoe UI', sans-serif;
+        background: linear-gradient(135deg, #0f172a, #1e1b4b);
+        color: white;
+    }
+
+    .layout {
+        display: flex;
+    }
+
+    /* ===== Sidebar ===== */
+    .sidebar {
+        width: 240px;
+        height: 100vh;
+        background: #0f172a;
+        padding: 30px 20px;
+        position: fixed;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .sidebar h2 {
+        margin-bottom: 40px;
+        font-weight: 600;
+        color: #a78bfa;
+    }
+
+    .sidebar a {
+        display: block;
+        color: #9ca3af;
+        text-decoration: none;
+        padding: 12px;
+        margin-bottom: 10px;
+        border-radius: 8px;
+        transition: 0.3s;
+    }
+
+    .sidebar a:hover {
+        background: #1e1b4b;
+        color: #c4b5fd;
+    }
+
+    /* Push logout to bottom properly */
+    .sidebar .spacer {
+        flex-grow: 1;
+    }
+
+    .logout-btn {
+        background: linear-gradient(90deg, #7c3aed, #6366f1);
+        text-align: center;
+        padding: 12px;
+        border-radius: 8px;
+        color: white;
+        text-decoration: none;
+        transition: 0.3s;
+    }
+
+    .logout-btn:hover {
+        opacity: 0.85;
+    }
+
+    /* ===== Main Content ===== */
+    .main {
+        margin-left: 260px;
+        padding: 40px;
+        width: 100%;
+    }
+
+    .card {
+        background: #1e293b;
+        padding: 25px;
+        border-radius: 12px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+        margin-bottom: 25px;
+    }
+
+    button {
+        padding: 10px 16px;
+        border: none;
+        border-radius: 6px;
+        background: linear-gradient(90deg, #7c3aed, #6366f1);
+        color: white;
+        cursor: pointer;
+    }
+
+    button:hover {
+        opacity: 0.85;
+    }
+    .page-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.page-header h1 {
+    font-size: 34px;
+    font-weight: 600;
+    background: linear-gradient(90deg, #a78bfa, #6366f1);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin: 0;
+}
+
+.page-header p {
+    color: #94a3b8;
+    margin-top: 8px;
+}
+.auth-container {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(135deg, #1e293b, #0f172a);
+}
+
+.auth-card {
+    background: #1e293b;
+    padding: 40px;
+    width: 350px;
+    border-radius: 16px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+    text-align: center;
+}
+
+.auth-card h2 {
+    margin-bottom: 25px;
+    font-weight: 600;
+    color: white;
+}
+
+.auth-card input {
+    width: 100%;
+    margin-bottom: 15px;
+    padding: 12px;
+    border-radius: 8px;
+    border: none;
+    background: #334155;
+    color: white;
+}
+
+.auth-card button {
+    width: 100%;
+    padding: 12px;
+    border-radius: 8px;
+    background: linear-gradient(90deg, #a78bfa, #6366f1);
+    border: none;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.auth-card button:hover {
+    transform: translateY(-2px);
+    opacity: 0.9;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="layout">
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <h2>🚀 SkillTrack</h2>
+
+        <a href="{% url 'dashboard' %}">🏠 Dashboard</a>
+        <a href="{% url 'profile' %}">👤 Profile</a>
+        <a href="{% url 'study_planner' %}">📅 Study Planner</a>
+        <a href="{% url 'logout' %}" class="logout-btn">Logout</a>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main">
+        {% block content %}
+        {% endblock %}
+    </div>
+
+</div>
+
+</body>
+</html>
